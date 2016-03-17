@@ -11,7 +11,7 @@ defmodule Smtpex.EmailController do
   end
 
   def create(conn, %{"email" => email_params}) do
-    changeset = Email.changeset(%Email{}, email_params)
+    changeset = Email.changeset(%Email{}, email_params["email"])
 
     case Repo.insert(changeset) do
       {:ok, email} ->
