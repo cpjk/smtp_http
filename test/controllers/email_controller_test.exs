@@ -6,58 +6,66 @@ defmodule Smtpex.EmailControllerTest do
   @invalid_attrs %{}
 
   setup do
-    conn = conn() |> put_req_header("accept", "application/json")
+    conn = conn()
     {:ok, conn: conn}
   end
 
   test "lists all entries on index", %{conn: conn} do
     conn = get conn, email_path(conn, :index)
-    assert json_response(conn, 200)["data"] == []
+    assert html_response(conn, 200) =~ "Listing emails"
   end
 
-  test "shows chosen resource", %{conn: conn} do
-    email = Repo.insert! %Email{}
-    conn = get conn, email_path(conn, :show, email)
-    assert json_response(conn, 200)["data"] == %{"id" => email.id,
-      "data" => email.data,
-      "sender_email" => email.sender_email,
-      "receiver_email" => email.receiver_email}
+  test "renders form for new resources", %{conn: conn} do
+    conn = get conn, email_path(conn, :new)
+    assert html_response(conn, 200) =~ "New email"
   end
 
-  test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-    assert_raise Ecto.NoResultsError, fn ->
-      get conn, email_path(conn, :show, -1)
-    end
-  end
-
-  test "creates and renders resource when data is valid", %{conn: conn} do
+  test "creates resource and redirects when data is valid", %{conn: conn} do
     conn = post conn, email_path(conn, :create), email: @valid_attrs
-    assert json_response(conn, 201)["data"]["id"]
+    assert redirected_to(conn) == email_path(conn, :index)
     assert Repo.get_by(Email, @valid_attrs)
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
     conn = post conn, email_path(conn, :create), email: @invalid_attrs
-    assert json_response(conn, 422)["errors"] != %{}
+    assert html_response(conn, 200) =~ "New email"
   end
 
-  test "updates and renders chosen resource when data is valid", %{conn: conn} do
+  test "shows chosen resource", %{conn: conn} do
+    email = Repo.insert! %Email{}
+    conn = get conn, email_path(conn, :show, email)
+    assert html_response(conn, 200) =~ "Show email"
+  end
+
+  test "renders page not found when id is nonexistent", %{conn: conn} do
+    assert_raise Ecto.NoResultsError, fn ->
+      get conn, email_path(conn, :show, -1)
+    end
+  end
+
+  test "renders form for editing chosen resource", %{conn: conn} do
+    email = Repo.insert! %Email{}
+    conn = get conn, email_path(conn, :edit, email)
+    assert html_response(conn, 200) =~ "Edit email"
+  end
+
+  test "updates chosen resource and redirects when data is valid", %{conn: conn} do
     email = Repo.insert! %Email{}
     conn = put conn, email_path(conn, :update, email), email: @valid_attrs
-    assert json_response(conn, 200)["data"]["id"]
+    assert redirected_to(conn) == email_path(conn, :show, email)
     assert Repo.get_by(Email, @valid_attrs)
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
     email = Repo.insert! %Email{}
     conn = put conn, email_path(conn, :update, email), email: @invalid_attrs
-    assert json_response(conn, 422)["errors"] != %{}
+    assert html_response(conn, 200) =~ "Edit email"
   end
 
   test "deletes chosen resource", %{conn: conn} do
     email = Repo.insert! %Email{}
     conn = delete conn, email_path(conn, :delete, email)
-    assert response(conn, 204)
+    assert redirected_to(conn) == email_path(conn, :index)
     refute Repo.get(Email, email.id)
   end
 end

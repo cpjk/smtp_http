@@ -1,0 +1,30 @@
+<h2>Listing emails</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Sender email</th>
+      <th>Receiver email</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for email <- @emails do %>
+    <tr>
+      <td><%= email.data %></td>
+      <td><%= email.sender_email %></td>
+      <td><%= email.receiver_email %></td>
+
+      <td class="text-right">
+        <%= link "Show", to: email_path(@conn, :show, email), class: "btn btn-default btn-xs" %>
+        <%= link "Edit", to: email_path(@conn, :edit, email), class: "btn btn-default btn-xs" %>
+        <%= link "Delete", to: email_path(@conn, :delete, email), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<%= link "New email", to: email_path(@conn, :new) %>
