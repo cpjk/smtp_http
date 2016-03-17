@@ -17,11 +17,12 @@ defmodule Smtpex.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    resources "/emails", EmailController, except: [:new, :edit]
+  end
+
+  scope "/api", Smtpex do
+    pipe_through :api
+    resources "/emails", API.EmailController, except: [:new, :edit]
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", Smtpex do
-  #   pipe_through :api
-  # end
 end

@@ -1,4 +1,4 @@
-defmodule Smtpex.EmailController do
+defmodule Smtpex.API.EmailController do
   use Smtpex.Web, :controller
 
   alias Smtpex.Email
@@ -7,7 +7,7 @@ defmodule Smtpex.EmailController do
 
   def index(conn, _params) do
     emails = Repo.all(Email)
-    render(conn, "index.json", emails: emails)
+    render(conn, "api/index.json", emails: emails)
   end
 
   def create(conn, %{"email" => email_params}) do
@@ -18,7 +18,7 @@ defmodule Smtpex.EmailController do
         conn
         |> put_status(:created)
         |> put_resp_header("location", email_path(conn, :show, email))
-        |> render("show.json", email: email)
+        |> render("api/show.json", email: email)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -28,7 +28,7 @@ defmodule Smtpex.EmailController do
 
   def show(conn, %{"id" => id}) do
     email = Repo.get!(Email, id)
-    render(conn, "show.json", email: email)
+    render(conn, "api/show.json", email: email)
   end
 
   def update(conn, %{"id" => id, "email" => email_params}) do
@@ -37,7 +37,7 @@ defmodule Smtpex.EmailController do
 
     case Repo.update(changeset) do
       {:ok, email} ->
-        render(conn, "show.json", email: email)
+        render(conn, "api/show.json", email: email)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
